@@ -1,7 +1,9 @@
 apply plugin: 'java'
 apply plugin: "com.github.sherter.google-java-format"
+apply plugin: 'application'
 
-// https://github.com/sherter/google-java-format-gradle-plugin
+mainClassName = findProperty("main") ?: "com.williamfiset.algorithms.${findProperty("algorithm") ?: 'missingPackage.missingClass'}"
+
 buildscript {
   repositories {
     maven {
@@ -9,11 +11,12 @@ buildscript {
     }
   }
   dependencies {
+    // https://github.com/sherter/google-java-format-gradle-plugin
     classpath "gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.8"
   }
 }
 
-// Assume Java 8
+// Require Java 8
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -22,27 +25,27 @@ repositories {
   mavenCentral()
 }
 
+// Describe all project deps. Use 'testCompile' for test dependencies and
+// 'compile' for project dependencies.
 dependencies {
-  
+  // Apache commons lang
+  testCompile 'org.apache.commons:commons-lang3:3.6'
+
   // JUnit framework
   testCompile 'junit:junit:4.+'
-  compile 'junit:junit:4.+'
 
   // JUnit 5 / Jupiter
   testImplementation('org.junit.jupiter:junit-jupiter-api:5.4.2')
-  testRuntime('org.junit.jupiter:junit-jupiter-engine:5.4.2')
    
+  // Google Guava lib
+  testCompile group: 'com.google.guava', name: 'guava', version: '22.0'
+
+  // Google Truth test framework
+  // https://mvnrepository.com/artifact/com.google.truth/truth
+  testCompile group: 'com.google.truth', name: 'truth', version: '1.0'
+
   // Test mocking framework
   testCompile "org.mockito:mockito-core:1.+"
-
-  // Google Guava lib
-  compile group: 'com.google.guava', name: 'guava', version: '22.0'
-
-  // Google truth API
-  compile "com.google.truth:truth:0.36"
-
-  // Apache commons lang
-  compile 'org.apache.commons:commons-lang3:3.6'
 }
 
 test {
@@ -50,48 +53,22 @@ test {
   testLogging.showStandardStreams = true
 }
 
-String javaAlgorithmsPackage = "com/williamfiset/algorithms";
-String javatestsAlgorithmsPackage = "javatests/com/williamfiset/algorithms";
-
-sourceSets {
-  main {
-    java {
-      srcDirs = [
-        javaAlgorithmsPackage + '/ai',
-        javaAlgorithmsPackage + '/dp',
-        javaAlgorithmsPackage + '/datastructures',
-        javaAlgorithmsPackage + '/geometry',
-        javaAlgorithmsPackage + '/graphtheory',
-        javaAlgorithmsPackage + '/linearalgebra',
-        javaAlgorithmsPackage + '/math',
-        javaAlgorithmsPackage + '/other',
-        javaAlgorithmsPackage + '/search',
-        javaAlgorithmsPackage + '/sorting',
-        javaAlgorithmsPackage + '/strings',
-        javaAlgorithmsPackage + '/utils'
-      ]
-    }
-  }
-  test {
-    java {
-      srcDirs = [
-        javatestsAlgorithmsPackage + '/ai',
-        javatestsAlgorithmsPackage + '/datastructures',
-        javatestsAlgorithmsPackage + '/dp',
-        javatestsAlgorithmsPackage + '/geometry',
-        javatestsAlgorithmsPackage + '/graphtheory',
-        javatestsAlgorithmsPackage + '/linearalgebra',
-        javatestsAlgorithmsPackage + '/math',
-        javatestsAlgorithmsPackage + '/other',
-        javatestsAlgorithmsPackage + '/search',
-        javatestsAlgorithmsPackage + '/sorting',
-        javatestsAlgorithmsPackage + '/strings',
-        javatestsAlgorithmsPackage + '/utils'
-      ]
-    }
-  }
+tasks.withType(JavaCompile) {
+  options.encoding = 'UTF-8'
+  options.compilerArgs += [
+    '-Xlint:unchecked',
+    '-Xlint:deprecation'
+  ]
 }
 
+// Options when compiling tests
+compileTestJava {
+  options.encoding = 'UTF-8'
+  options.compilerArgs += [
+    '-Xlint:unchecked',
+    '-Xlint:deprecation'
+  ]
+}
 
 task buildDependenciesFolder(type: Copy) {
   from configurations.compile
