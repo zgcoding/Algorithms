@@ -35,15 +35,18 @@ public class GenericSegmentTree2 {
     MULTIPLICATION
   }
 
-  private static class Segment {
-    // TODO(william): investigate if we really need this, it's unlikely that we do.
+  private static class Segment { // implements PrintableNode
+    // TODO(william): investigate if we really need this, it's unlikely that we do since it should
+    // be able to implicitly determine the index.
     int i;
 
     Long value;
     Long lazy;
 
-    // Used only for Min/Max mul queries
-    Long min, max;
+    // Used only for Min/Max mul queries. Used in an attempt to resolve:
+    // https://github.com/williamfiset/Algorithms/issues/208
+    Long min;
+    Long max;
 
     // The range of the segment [tl, tr]
     int tl;
@@ -57,6 +60,21 @@ public class GenericSegmentTree2 {
       this.tl = tl;
       this.tr = tr;
     }
+
+    // @Override
+    // public PrintableNode getLeft() {
+    //   return left;
+    // }
+
+    // @Override
+    // public PrintableNode getRight() {
+    //   return right;
+    // }
+
+    // @Override
+    // public String getText() {
+    //   return value.toString();
+    // }
 
     @Override
     public String toString() {
